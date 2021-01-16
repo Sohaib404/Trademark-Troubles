@@ -1,5 +1,9 @@
-'''
-Created on Jan. 16, 2021
+import discord
 
-@author: dagga
-'''
+class botClient(discord.Client):   
+    async def on_ready(self):
+        print('Logged on as' + self.user)
+        
+    
+        
+    
