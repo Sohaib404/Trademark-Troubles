@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import random
+from pickle import NONE
 
 class Player():
     def __init__(self):
@@ -20,6 +21,7 @@ class bizBot():
     presentOrder = None
     slideIndex = 0
     
+    voted = []
     
     players = {}
     
@@ -78,7 +80,13 @@ async def play(ctx):
 @bot.command()
 async def leave(ctx):
     if ctx.message.author in bizBot.players:
-        bizBot.players.remove(ctx.message.author)
+        del bizBot.players[ctx.message.author]
+        del bizBot.voted[ctx.message.author]
+        del bizBot.presentOrder[ctx.message.Author]
+        if bizBot.currentPresent == ctx.message.author:
+            bizBot.currentPresent = None
+            bizBot.slideIndex = 0
+            
  
 async def distributeProblems():
     random.shuffle(bizBot.problems)
@@ -111,6 +119,7 @@ async def on_message(message: discord.Message):
 
 @bot.command()
 async def next(ctx):
+    await ctx.channel.purge(limit=1)
     print(bizBot.players[ctx.author].presentables)
     print(bizBot.players)
     if bizBot.gamePhase == 'presenting' and ctx.author in bizBot.players:
@@ -140,8 +149,41 @@ async def next(ctx):
                     await ctx.channel.send("PRESENTING OVER!")
         else:
             await ctx.channel.send("PRESENTING OVER!")
+
+@bot.command()
+async def vote(ctx,msg):
     await ctx.channel.purge(limit=1)
-            
+    if bizBot.gamePhase == 'voting':
+        num = int(msg)
+    
+        if ctx.author not in bizBot.voted:
+            bizBot.voted.append(ctx.author)
+            bizBot.players[bizBot.presentOrder[num]].votes += 1
+    
+    if len(bizBot.voted) == len(bizBot.players):
+        maxP = [None,0]
+        for playerObj,player in bizBot.players.items():
+            if player.votes > maxP[1]:
+                maxP = [playerObj,player.votes]
+        await ctx.send("THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name)
+        bizBot.players = {}
+        bizBot.presentOrder = None
+        bizBot.problems = []
+
+
+        bizBot.gamePhase = "none"
+        
+        bizBot.currentPresentIndex = 0  
+        bizBot.currentPresent = None
+        bizBot.presentOrder = None
+        bizBot.slideIndex = 0
+        
+        bizBot.voted = []
+        
+        
+        bizBot.admin = None
+    
+       
 @bot.command()
 async def done(ctx):
     if bizBot.gamePhase == "starting":
@@ -155,6 +197,8 @@ async def done(ctx):
         bizBot.gamePhase = "presenting"
     elif bizBot.gamePhase == "presenting":
         await ctx.channel.send("Voting phase begins.")
+        for i,player in enumerate(bizBot.presentOrder):
+            await ctx.channel.send("!vote " + str(i) + " for " + player.name + " who solved: " + bizBot.players[player].problem)
         bizBot.gamePhase = "voting"
 
 
