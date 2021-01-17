@@ -128,7 +128,8 @@ async def next(ctx):
                 
             if ctx.author == bizBot.currentPresent:
                 if bizBot.slideIndex < len(bizBot.players[ctx.author].presentables):
-                    presentable = bizBot.players[ctx.author].presentables[bizBot.slideIndex]                   
+                    presentable = bizBot.players[ctx.author].presentables[bizBot.slideIndex]
+                    
                     if isinstance(presentable,str):
                         await ctx.channel.send(presentable)
                     else:
@@ -181,13 +182,13 @@ async def vote(ctx,msg):
             bizBot.voted.append(ctx.author)
             bizBot.players[bizBot.presentOrder[num]].votes += 1
     
-        if len(bizBot.voted) == len(bizBot.players):
-            maxP = [None,0]
-            for playerObj,player in bizBot.players.items():
-                if player.votes > maxP[1]:
-                    maxP = [playerObj,player.votes]
-            await ctx.send("THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name)
-            await endGame()
+    if len(bizBot.voted) == len(bizBot.players):
+        maxP = [None,0]
+        for playerObj,player in bizBot.players.items():
+            if player.votes > maxP[1]:
+                maxP = [playerObj,player.votes]
+        await ctx.send("THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name)
+        await endGame()
     
        
 @bot.command()
@@ -198,20 +199,14 @@ async def done(ctx):
         await distributeProblems()
     elif bizBot.gamePhase == "planning":
         await ctx.channel.send("Presenting phase begins. Use !next to move to the first presenter and to move to the next slide.")
-        bizBot.presentOrder = list(bizBot.players.keys())      
+        bizBot.presentOrder = list(bizBot.players.keys())
+        
         bizBot.gamePhase = "presenting"
     elif bizBot.gamePhase == "presenting":
         await ctx.channel.send("Voting phase begins.")
         for i,player in enumerate(bizBot.presentOrder):
             await ctx.channel.send("!vote " + str(i) + " for " + player.name + " who solved: " + bizBot.players[player].problem)
         bizBot.gamePhase = "voting"
-
-@bot.command()
-async def delete(ctx):
-    if bizBot.gamePhase == "planning" and ctx.author in bizBot.players:
-        if len(bizBot.players[ctx.author].presentables) != 0:
-            bizBot.players[ctx.author].presentables.pop()
-        
 
 
 bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.wf7PoDS1dFxfDjKwDlpixYgY0b4")
