@@ -90,11 +90,17 @@ async def play(ctx):
 async def leave(ctx):
     if ctx.message.author in bizBot.players:
         del bizBot.players[ctx.message.author]
-        del bizBot.voted[ctx.message.author]
-        del bizBot.presentOrder[ctx.message.Author]
+        if bizBot.gamePhase == 'presenting' or bizBot.gamePhase == 'voting':        
+            bizBot.presentOrder.remove(ctx.meessage.author)
+            
         if bizBot.currentPresent == ctx.message.author:
             bizBot.currentPresent = None
             bizBot.slideIndex = 0
+        
+        if len(bizBot.players) == 0 or bizBot.admin == ctx.message.author:
+            await endGame(ctx)
+            
+        bizBot.voted.remove(ctx.message.author)
             
 
 async def distributeProblems():
