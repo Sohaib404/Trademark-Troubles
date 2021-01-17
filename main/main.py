@@ -47,6 +47,9 @@ async def start(ctx):
 @bot.event
 async def on_ready():
     print("Bot Online")
+    #make folder to store images
+    if not "imgs" in os.listdir("."):
+        os.mkdir("imgs")
 
 @bot.command()
 async def wisdom(ctx):
@@ -77,11 +80,11 @@ async def submit(ctx, *, problem="None"):
     
 @bot.command()
 async def play(ctx):
-      if ctx.message.author not in bizBot.players and bizBot.gamePhase == "none":
-            bizBot.players[ctx.message.author] = Player()
-            await ctx.send("**" + ctx.message.author.name + " joined the game.**")
-            await ctx.send("**Use !start to become the game master and start the game.**")
-      print(bizBot.players)
+    if ctx.message.author not in bizBot.players and bizBot.gamePhase == "none":
+        bizBot.players[ctx.message.author] = Player()
+        await ctx.send("**" + ctx.message.author.name + " joined the game.**")
+        await ctx.send("**Use !start to become the game master and start the game.**")
+    print(bizBot.players)
     
 @bot.command()
 async def leave(ctx):
@@ -198,23 +201,23 @@ async def vote(ctx,msg):
        
 @bot.command()
 async def done(ctx):
-      if bizBot.admin == ctx.author:
-            if bizBot.gamePhase == "starting":
-                  await ctx.channel.send("**Planning phase begins. Check private DM's. Use !done to end planning phase.**")
-                  bizBot.gamePhase = "planning"
-                  await distributeProblems()
-            elif bizBot.gamePhase == "planning":
-                  await ctx.channel.send("**Presenting phase begins. Use !next to move to the next presenter/next slide.**")
-                  bizBot.presentOrder = list(bizBot.players.keys())
+    if bizBot.admin == ctx.author:
+        if bizBot.gamePhase == "starting":
+            await ctx.channel.send("**Planning phase begins. Check private DM's. Use !done to end planning phase.**")
+            bizBot.gamePhase = "planning"
+            await distributeProblems()
+        elif bizBot.gamePhase == "planning":
+            await ctx.channel.send("**Presenting phase begins. Use !next to move to the next presenter/next slide.**")
+            bizBot.presentOrder = list(bizBot.players.keys())
                   
-                  bizBot.gamePhase = "presenting"
-            elif bizBot.gamePhase == "presenting":
-                  await ctx.channel.send("**Voting phase begins.**")
-                  for i,player in enumerate(bizBot.presentOrder):
-                        await ctx.channel.send("!vote " + str(i) + " for " + player.name + " who solved: " + bizBot.players[player].problem)
-                  bizBot.gamePhase = "voting"
-      else :
-             await ctx.channel.send("**You must be the game master to use !done.**")
+            bizBot.gamePhase = "presenting"
+        elif bizBot.gamePhase == "presenting":
+            await ctx.channel.send("**Voting phase begins.**")
+            for i,player in enumerate(bizBot.presentOrder):
+                await ctx.channel.send("!vote " + str(i) + " for " + player.name + " who solved: " + bizBot.players[player].problem)
+            bizBot.gamePhase = "voting"
+    else :
+        await ctx.channel.send("**You must be the game master to use !done.**")
 
 
 bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.wf7PoDS1dFxfDjKwDlpixYgY0b4")
