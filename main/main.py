@@ -40,6 +40,7 @@ bot = commands.Bot(command_prefix="!")
 async def start(ctx):
     if bizBot.gamePhase == "none":
         bizBot.gamePhase = "starting"
+        await ctx.channel.send("**Game started, use !submit <prompt> to submit as many promts as you'd like.\nUse !done when you're all done submitting prompts.**")
         bizBot.admin = ctx.message.author
             
         
@@ -51,16 +52,16 @@ async def on_ready():
 async def wisdom(ctx):
     #depressing wisdom bot
     wisdoms = [
-        "Only the dead have seen the end of war.",
-        "Violence is the last refuge of the incompetent.",
-        "When you have to kill a man, it costs nothing to be polite.",
-        "Death, in its silent sure march is fast gathering those whom I have longest loved, so that when he shall knock at my door, I will more willingly follow.",
-        "The last enemy that shall be destroyed is death.",
-        "If you expect the worst, you'll never be disappointed.",
-        "To die will be an awfully big adventure.",
-        "One may as well be optimistic. The road to catastrophe will be rougher if it's paved with dread.",
-        "Behind every beautiful thing, there's some kind of pain.",
-        "Each night, when I go to sleep, I die."
+        "**Only the dead have seen the end of war.**",
+        "**Violence is the last refuge of the incompetent.**",
+        "**When you have to kill a man, it costs nothing to be polite.**",
+        "**Death, in its silent sure march is fast gathering those whom I have longest loved, so that when he shall knock at my door, I will more willingly follow.**",
+        "**The last enemy that shall be destroyed is death.**",
+        "**If you expect the worst, you'll never be disappointed.**",
+        "**To die will be an awfully big adventure.**",
+        "**One may as well be optimistic. The road to catastrophe will be rougher if it's paved with dread.**",
+        "**Behind every beautiful thing, there's some kind of pain.**",
+        "**Each night, when I go to sleep, I die.**"
         
     ]
     await ctx.send(content=f"{random.choice(wisdoms)}", tts=True)
@@ -71,13 +72,16 @@ async def submit(ctx, *, problem="None"):
     if bizBot.gamePhase == "starting" and ctx.message.author in bizBot.players:
         await ctx.channel.purge(limit=1)
         bizBot.problems.append(problem)
+        await ctx.send("**" + ctx.message.author.name + " submitted a prompt.**")
     print(bizBot.problems)
     
 @bot.command()
 async def play(ctx):
-    if ctx.message.author not in bizBot.players and bizBot.gamePhase == "none":
-        bizBot.players[ctx.message.author] = Player()
-    print(bizBot.players)
+      if ctx.message.author not in bizBot.players and bizBot.gamePhase == "none":
+            bizBot.players[ctx.message.author] = Player()
+            await ctx.send("**" + ctx.message.author.name + " joined the game.**")
+            await ctx.send("**Use !start to become the game master and start the game.**")
+      print(bizBot.players)
     
 @bot.command()
 async def leave(ctx):
@@ -93,8 +97,8 @@ async def leave(ctx):
 async def distributeProblems():
     random.shuffle(bizBot.problems)
     for i,p in enumerate(bizBot.players.items()):
-        await p[0].send(bizBot.problems[i])
-        await p[0].send("Use !text <text> to add a text description\nAttach an image in a message to add a image\nUse !delete to remove your last added presentable")
+        await p[0].send("**Your prompt is: **" + bizBot.problems[i] + "**.**")
+        await p[0].send("**Use !text <text> to add a text description\nAttach an image in a message to add a image.\n**")
         bizBot.players[p[0]].problem = bizBot.problems[i]
         
         
@@ -128,7 +132,8 @@ async def next(ctx):
                 
             if ctx.author == bizBot.currentPresent:
                 if bizBot.slideIndex < len(bizBot.players[ctx.author].presentables):
-                    presentable = bizBot.players[ctx.author].presentables[bizBot.slideIndex]                   
+                    presentable = bizBot.players[ctx.author].presentables[bizBot.slideIndex]
+                    
                     if isinstance(presentable,str):
                         await ctx.channel.send(presentable)
                     else:
@@ -140,14 +145,15 @@ async def next(ctx):
                     bizBot.slideIndex = 0
             
             if bizBot.currentPresent == None and bizBot.currentPresentIndex < len(bizBot.presentOrder):
+                await ctx.channel.send("**------------------------------------------------------------------**")
                 await ctx.channel.send("Next presenter is: " + bizBot.presentOrder[bizBot.currentPresentIndex].name)
                 bizBot.currentPresent = bizBot.presentOrder[bizBot.currentPresentIndex]
                 await ctx.channel.send("Their problem was: " + bizBot.players[bizBot.currentPresent].problem)
                 
                 if bizBot.currentPresentIndex >= len(bizBot.presentOrder):
-                    await ctx.channel.send("PRESENTING OVER!")
+                    await ctx.channel.send("**PRESENTING OVER! Use !done to start voting phase.**")
         else:
-            await ctx.channel.send("PRESENTING OVER!")
+            await ctx.channel.send("**PRESENTING OVER! Use !done to start voting phase.**")
 
 async def endGame():
     bizBot.players = {}
@@ -181,37 +187,34 @@ async def vote(ctx,msg):
             bizBot.voted.append(ctx.author)
             bizBot.players[bizBot.presentOrder[num]].votes += 1
     
-        if len(bizBot.voted) == len(bizBot.players):
-            maxP = [None,0]
-            for playerObj,player in bizBot.players.items():
-                if player.votes > maxP[1]:
-                    maxP = [playerObj,player.votes]
-            await ctx.send("THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name)
-            await endGame()
+    if len(bizBot.voted) == len(bizBot.players):
+        maxP = [None,0]
+        for playerObj,player in bizBot.players.items():
+            if player.votes > maxP[1]:
+                maxP = [playerObj,player.votes]
+        await ctx.send("**:confetti_ball:THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name + "!:confetti_ball:**")
+        await endGame()
     
        
 @bot.command()
 async def done(ctx):
-    if bizBot.gamePhase == "starting":
-        await ctx.channel.send("Planning phase begins. Check private DM's")
-        bizBot.gamePhase = "planning"
-        await distributeProblems()
-    elif bizBot.gamePhase == "planning":
-        await ctx.channel.send("Presenting phase begins. Use !next to move to the first presenter and to move to the next slide.")
-        bizBot.presentOrder = list(bizBot.players.keys())      
-        bizBot.gamePhase = "presenting"
-    elif bizBot.gamePhase == "presenting":
-        await ctx.channel.send("Voting phase begins.")
-        for i,player in enumerate(bizBot.presentOrder):
-            await ctx.channel.send("!vote " + str(i) + " for " + player.name + " who solved: " + bizBot.players[player].problem)
-        bizBot.gamePhase = "voting"
-
-@bot.command()
-async def delete(ctx):
-    if bizBot.gamePhase == "planning" and ctx.author in bizBot.players:
-        if len(bizBot.players[ctx.author].presentables) != 0:
-            bizBot.players[ctx.author].presentables.pop()
-        
+      if bizBot.admin == ctx.author:
+            if bizBot.gamePhase == "starting":
+                  await ctx.channel.send("**Planning phase begins. Check private DM's. Use !done to end planning phase.**")
+                  bizBot.gamePhase = "planning"
+                  await distributeProblems()
+            elif bizBot.gamePhase == "planning":
+                  await ctx.channel.send("**Presenting phase begins. Use !next to move to the next presenter/next slide.**")
+                  bizBot.presentOrder = list(bizBot.players.keys())
+                  
+                  bizBot.gamePhase = "presenting"
+            elif bizBot.gamePhase == "presenting":
+                  await ctx.channel.send("**Voting phase begins.**")
+                  for i,player in enumerate(bizBot.presentOrder):
+                        await ctx.channel.send("!vote " + str(i) + " for " + player.name + " who solved: " + bizBot.players[player].problem)
+                  bizBot.gamePhase = "voting"
+      else :
+             await ctx.channel.send("**You must be the game master to use !done.**")
 
 
 bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.wf7PoDS1dFxfDjKwDlpixYgY0b4")
