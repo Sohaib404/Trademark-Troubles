@@ -158,7 +158,10 @@ async def next(ctx):
         else:
             await ctx.channel.send("**PRESENTING OVER! Use !done to start voting phase.**")
 
-async def endGame():
+async def endGame(ctx):
+    
+    await ctx.send("**GAME HAS ENDED**")
+    
     bizBot.players = {}
     bizBot.presentOrder = None
     bizBot.problems = []
@@ -179,6 +182,14 @@ async def endGame():
     #remove all images once done
     for f in os.listdir(bizBot.imageFolder):
         os.remove(os.path.join(bizBot.imageFolder,f))
+        
+@bot.command()
+async def restart(ctx):
+    if bizBot.gamePhase != "none":
+        if bizBot.admin == ctx.author:
+            await endGame(ctx)
+        else:
+            await ctx.send("**ONLY THE GAME MASTER CAN RESTART THE GAME:** " + bizBot.admin.name)
 
 @bot.command()
 async def vote(ctx,msg):
@@ -196,7 +207,7 @@ async def vote(ctx,msg):
             if player.votes > maxP[1]:
                 maxP = [playerObj,player.votes]
         await ctx.send("**:confetti_ball:THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name + "!:confetti_ball:**")
-        await endGame()
+        await endGame(ctx)
     
 @bot.command()
 async def helptmt(ctx):
@@ -221,7 +232,7 @@ async def done(ctx):
     else :
         await ctx.channel.send("**You must be the game master to use !done.**")
     
-bot.run("BOT_TOKEN_HERE")
+bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.vQkuRzTvQ6Wb-j5VpJzqZA_Myb4")
 
 
 
