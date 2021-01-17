@@ -53,18 +53,18 @@ async def on_ready():
 
 @bot.command()
 async def wisdom(ctx):
-    #depressing wisdom bot
+    #depressing wisdom bot easter egg
     wisdoms = [
         "**Only the dead have seen the end of war.**",
         "**Violence is the last refuge of the incompetent.**",
         "**When you have to kill a man, it costs nothing to be polite.**",
-        "**Death, in its silent sure march is fast gathering those whom I have longest loved, so that when he shall knock at my door, I will more willingly follow.**",
         "**The last enemy that shall be destroyed is death.**",
         "**If you expect the worst, you'll never be disappointed.**",
-        "**To die will be an awfully big adventure.**",
         "**One may as well be optimistic. The road to catastrophe will be rougher if it's paved with dread.**",
         "**Behind every beautiful thing, there's some kind of pain.**",
-        "**Each night, when I go to sleep, I die.**"
+        "**Appear weak when you are strong, and strong when you are weak.**",
+        "**Let your plans be dark and impenetrable as night, and when you move, fall like a thunderbolt.**",
+        "**If you know the enemy and know yourself, you need not fear the result of a hundred battles.**"
         
     ]
     await ctx.send(content=f"{random.choice(wisdoms)}", tts=True)
@@ -96,11 +96,11 @@ async def leave(ctx):
             bizBot.currentPresent = None
             bizBot.slideIndex = 0
             
- 
+
 async def distributeProblems():
     random.shuffle(bizBot.problems)
     for i,p in enumerate(bizBot.players.items()):
-        await p[0].send("**Your prompt is: **" + bizBot.problems[i] + "**.**")
+        await p[0].send("**Your problem to solve is: **" + bizBot.problems[i] + "**.**")
         await p[0].send("**Use !text <text> to add a text description\nAttach an image in a message to add a image.\n**")
         bizBot.players[p[0]].problem = bizBot.problems[i]
         
@@ -198,7 +198,9 @@ async def vote(ctx,msg):
         await ctx.send("**:confetti_ball:THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name + "!:confetti_ball:**")
         await endGame()
     
-       
+@bot.command()
+async def helptmt(ctx):
+    await ctx.send("TradeMark Troubles help:\n!play to join the game!\n!start to become the game master and start the game\n")       
 @bot.command()
 async def done(ctx):
     if bizBot.admin == ctx.author:
@@ -218,6 +220,8 @@ async def done(ctx):
             bizBot.gamePhase = "voting"
     else :
         await ctx.channel.send("**You must be the game master to use !done.**")
+    
+bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.ICbT5WXF7RCJqQlYNp7TPNQOFFw")
 
 
-bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.wf7PoDS1dFxfDjKwDlpixYgY0b4")
+
