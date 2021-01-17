@@ -150,6 +150,28 @@ async def next(ctx):
         else:
             await ctx.channel.send("PRESENTING OVER!")
 
+async def endGame():
+    bizBot.players = {}
+    bizBot.presentOrder = None
+    bizBot.problems = []
+
+
+    bizBot.gamePhase = "none"
+    
+    bizBot.currentPresentIndex = 0  
+    bizBot.currentPresent = None
+    bizBot.presentOrder = None
+    bizBot.slideIndex = 0
+    
+    bizBot.voted = []
+    
+    
+    bizBot.admin = None
+    
+    #remove all images once done
+    for f in os.listdir(bizBot.imageFolder):
+        os.remove(os.path.join(bizBot.imageFolder,f))
+
 @bot.command()
 async def vote(ctx,msg):
     await ctx.channel.purge(limit=1)
@@ -166,25 +188,7 @@ async def vote(ctx,msg):
             if player.votes > maxP[1]:
                 maxP = [playerObj,player.votes]
         await ctx.send("THE PLAYER WITH THE MOST VOTES IS " + maxP[0].name)
-        bizBot.players = {}
-        bizBot.presentOrder = None
-        bizBot.problems = []
-
-
-        bizBot.gamePhase = "none"
-        
-        bizBot.currentPresentIndex = 0  
-        bizBot.currentPresent = None
-        bizBot.presentOrder = None
-        bizBot.slideIndex = 0
-        
-        bizBot.voted = []
-        
-        
-        bizBot.admin = None
-        
-        for f in os.listdir(bizBot.imageFolder):
-            os.remove(os.path.join(bizBot.imageFolder,f))
+        await endGame()
     
        
 @bot.command()
