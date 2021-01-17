@@ -1,12 +1,14 @@
 import discord
 from discord.ext import commands
+from discord.voice_client import VoiceClient
+
 import random
 
 bot = commands.Bot(command_prefix = "!")
 
 @bot.event
 async def on_ready():
-    print("Logged in")
+    print("Bot Online")
 
 @bot.command()
 async def wisdom(ctx):
@@ -27,7 +29,9 @@ async def wisdom(ctx):
     await ctx.send(content=f"{random.choice(wisdoms)}", tts=True)
 
 @bot.command()
-async def clear(ctx, amount=1000):
-    await ctx.channel.purge(limit=amount)
+async def clear(ctx, *, problem="None"):
+    await ctx.channel.purge(limit=1)
+    print(problem)
+    
 
 bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.Nxln1b6nGLpkKBY5gWL-L86R_jY")
