@@ -232,7 +232,7 @@ async def done(ctx):
     else :
         await ctx.channel.send("**You must be the game master to use !done.**")
     
-bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.vQkuRzTvQ6Wb-j5VpJzqZA_Myb4")
+bot.run("BOT_TOKEN_HERE")
 
 
 
