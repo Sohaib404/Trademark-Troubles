@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import random
-from pickle import NONE
+import os
 
 class Player():
     def __init__(self):
@@ -12,6 +12,8 @@ class Player():
 class bizBot():
         
     problems = []
+    
+    imageFolder = "imgs\\"
     
     #gamephases none: no game started, starting: submitting ideas, planning: making ideas, presenting, voting
     gamePhase = "none"
@@ -109,13 +111,11 @@ async def on_message(message: discord.Message):
     if bizBot.gamePhase == "planning" and message.author in bizBot.players:
         for attachment in message.attachments:
             if any(attachment.filename.lower().endswith(image) for image in image_types):
-                await attachment.save(attachment.filename)
-                bizBot.players[message.author].presentables.append(discord.File(attachment.filename))
+                await attachment.save(bizBot.imageFolder + attachment.filename)
+                bizBot.players[message.author].presentables.append(discord.File(bizBot.imageFolder + attachment.filename))
                 #await message.channel.send(file = bizBot.players[message.author].presentables[-1])
         
     await bot.process_commands(message)
-
-
 
 @bot.command()
 async def next(ctx):
@@ -182,6 +182,9 @@ async def vote(ctx,msg):
         
         
         bizBot.admin = None
+        
+        for f in os.listdir(bizBot.imageFolder):
+            os.remove(os.path.join(bizBot.imageFolder,f))
     
        
 @bot.command()
