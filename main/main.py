@@ -40,7 +40,7 @@ bot = commands.Bot(command_prefix="!")
 async def start(ctx):
     if bizBot.gamePhase == "none":
         bizBot.gamePhase = "starting"
-        await ctx.channel.send("**Game started, use !submit <prompt> to submit as many promts as you'd like.\nUse !done when you're all done submitting prompts.**")
+        await ctx.channel.send("**Game started, use !submit <prompt> to submit as many problem promts as you'd like.\nUse !done when you're all done submitting.**")
         bizBot.admin = ctx.message.author
             
         
@@ -221,7 +221,7 @@ async def done(ctx):
     else :
         await ctx.channel.send("**You must be the game master to use !done.**")
     
-bot.run("ODAwMDg2Mjg1MTY3MzYyMDQ5.YANAaw.ICbT5WXF7RCJqQlYNp7TPNQOFFw")
+bot.run("BOT_TOKEN_HERE")
 
 
 
