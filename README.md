@@ -20,6 +20,11 @@ We used Python and the discordpy library. We also used google-cloud to host the 
  - Use !done to end planning phase.
  - Presenting phase begins. Use !next to move to the next presenter/next slide.
  - Voting phase begins. Use !vote <num> to vote for the player with the best solution for their problem.
+ - Members that can Manage Channels can end and restart a game halfway through using !restart
+ 
+<sub><sup>!wisdom</sup></sub>
+<sub><sup>:)</sup></sub>
+
 
 ## What's next for Trademark Troubles!
 Scale it up so that the bot can run multiple simultaneous games on different servers.
