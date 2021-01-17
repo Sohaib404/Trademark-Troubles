@@ -10,7 +10,7 @@ class Player():
         self.votes = 0
     
 class bizBot():
-        
+    #class full of game logic stuff
     problems = []
     
     imageFolder = "imgs\\"
